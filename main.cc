@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 	// A better implementation could be achieved using a json file to set these parameters (i may consider it later)
 
 	G4bool enableTrackingVerbose = false;
-	G4bool enableVis = true;	// enable visualization, set to false when running heavy batch jobs
+	G4bool enableVis = false;	// enable visualization, set to false when running heavy batch jobs
 	G4int threads = 20;			// number of threads to be used in MT mode, ignore in ST mode
 	
 	G4String siliconPMSDName = "/SiliconPM";
@@ -160,20 +160,23 @@ int main(int argc, char** argv) {
 	auto UImanager = G4UImanager::GetUIpointer();
 	auto visManager = new G4VisExecutive(argc, argv);
 	
+
+	UImanager->ApplyCommand("/control/execute macros\\init.mac");
+
+	UImanager->ApplyCommand("/control/execute macros\\build_custom_gui.mac");
 	if (enableVis)
 	{
 		visManager->Initialize();
 		UImanager->ApplyCommand("/control/execute macros\\vis.mac");
 		UImanager->ApplyCommand("/control/execute macros\\paint_geometry.mac");
-		UImanager->ApplyCommand("/control/execute macros\\build_custom_gui.mac");
+	}
 
-		if (enableTrackingVerbose)
-		{
-			UImanager->ApplyCommand("/tracking/verbose 1");
-		}
-		else {
-			UImanager->ApplyCommand("/tracking/verbose 0");
-		}
+	if (enableTrackingVerbose)
+	{
+		UImanager->ApplyCommand("/tracking/verbose 1");
+	}
+	else {
+		UImanager->ApplyCommand("/tracking/verbose 0");
 	}
 
 	ui->SessionStart();

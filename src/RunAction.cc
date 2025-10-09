@@ -22,6 +22,16 @@ RunAction::RunAction(RunActionParameters runActionParameters)
 	analysisManager->CreateH2("CerOpticalPhotonsSpread", "Cer Optical Photons Spread; X (mm); Y (mm)", 1000, -40, 40, 1000, -40, 40);
 
 	analysisManager->CreateH1("OpticalPhotonsReflections", "Optical Photons Reflections", 10, 0, 10);
+
+	analysisManager->CreateNtuple("PerEventCollectedData", "Per-Event Collected Data");
+	analysisManager->CreateNtupleDColumn("EventID");
+	analysisManager->CreateNtupleDColumn("ScintOPsCollected");
+	analysisManager->CreateNtupleDColumn("CerOPsCollected");
+	analysisManager->CreateNtupleDColumn("ScintTotalEdep");
+	analysisManager->CreateNtupleDColumn("SiPMTotalEdep");
+	analysisManager->CreateNtupleDColumn("CoatingTotalEdep");
+	analysisManager->CreateNtupleDColumn("MuPathLength");
+	analysisManager->FinishNtuple();
 }
 
 RunAction::~RunAction()

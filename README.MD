@@ -25,7 +25,7 @@ With that in mind i implemented a simple geometry configuration (following the s
 
 This is the workflow i usually follow when working in Geant4:
 1. program geometry, materials, optical properties and primary generator actions, check that everything works as expected.
-2. program SDs, run / event / tracxking / stepping actions to export data from the simulation, verify that the data matches the theory.
+2. program SDs, MVD, run / event / tracxking / stepping actions to export data from the simulation, verify that the data matches the theory.
 
 
 # Observations  
@@ -72,6 +72,11 @@ The spread of the muon beam at the target surface means that the total length
 of the muon path inside the scintillator is not constant (therefore a normalization process should be considered).
 Is this a negligible effect or is it something already considered in the theory/literature?
 
+**3)**
+Can the optimization problem be solved using machine learning (Bayesian Optimization / Genetic Algorithms / Reinforcement Learning)? 
+Is this a valid practice or is it a niche? Are there better ways to handle optimization?
+Should i invest my time/resources practicing at it or is it something not useful in the industry?
+
 # Output
 ---
 Before prooceding i want to report some important considerations regarding data.
@@ -86,22 +91,20 @@ I want to produce the following plots (where scint/cer accounts for two separate
 **Wavelength Distribution of Detected Scint/cer Optical Photons (counts / nm)**: 
 **Emission Time Distribution of Detected Scint/cer Optical Photons (counts / ns)**:
 this is just a cross check plot to verify that the optical processes were correctly implemented.
-(considerations above apply).
 
 **Number of Reflections of Detected Optical Photons (count / Reflections)**:
 this is a nice to have plot, it will tell me how many reflections the detected photons underwent before being detected,
-it could aslo be a useful information to optimize the geometry of the detector (considerations above apply).
+it could aslo be a useful information to optimize the geometry of the detector.
 
 **2D Binned Histogram Hit Map of Scint/Cer Optical Photons on the SiPM Surface (counts / mm²)**:
-this could provide a way to visualize the spread of the optical photons as a function of the beam position
-(considerations above doesnt apply since this is a simple matrix of arbitrary fixed size).
+this could provide a way to visualize the spread of the optical photons as a function of the beam position.
 
 **Photon Fate Table (%)**:
 a table that shows the percentage of optical photons in each step of their life,
 like "generated → reached SiPM surface → transmitted → detected" to quickly visualize the transport efficiency.
 
 **Scint/Cer Optical Photons Count (counts / net optical photons detected by the SiPM)**:
-this is a crucial plot, it will tell roughly (quite realistically, after processing the signal like real SiPMs do) 
+this is a crucial plot, it will tell roughly (quite realistically after processing the signal like real SiPMs do) 
 how much energy the incident muon deposited in the detector and how much of that energy was detected by the SiPM.
 
 **Total Energy Deposition by Component/Material & Particle Type (for secondaries) (MeV)**:
@@ -116,7 +119,6 @@ since the number of both scintillation and cerenkov optical photons detected is 
 (it could also be cool to store a boolean for muons stopping inside the material).
 
 
-
 # Next Step
 ---
 After veryfing the correct implementation of the detector it will be used in the complete hodoscope simulation.
@@ -128,3 +130,4 @@ After veryfing the correct implementation of the detector it will be used in the
 - 2025-10-04: Successfully implemented the geometry (materials, optical properties, physical objects), now i plan to implement the detection logic.
 - 2025-10-08: Successfully implemented the SiPM SD, run action and event action to plot optical photons data, now i'll add the tracking action to sample the reflections of the optical photons.
 - 2025-10-09: Successfully implemented the tracking logic to sample the reflections of the optical photons, now i'll take care of the energy deposition.
+- 2025-10-09: Successfully implemented the energy deposition logic + muon path length sampling.

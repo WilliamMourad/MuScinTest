@@ -22,4 +22,5 @@ public:
 private:
 	G4String _cName;
 	G4THitsCollection<OpticalPhotonHit>* opHitsCollection;
+	G4int hcID; // cache the hit collection ID to improve performances
 };

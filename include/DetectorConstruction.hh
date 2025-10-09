@@ -100,4 +100,8 @@ private:
 	G4LogicalBorderSurface* coating_front_to_scint;
 	G4LogicalBorderSurface* scint_to_sipm;
 	G4LogicalBorderSurface* sipm_to_scint;
+
+	// For a better implementation I should consider adding also some class variables
+	// for the names/instances of volumes/borders, initializing the names in the constructor.
+	// (in order to easily use them within other classes)
 };

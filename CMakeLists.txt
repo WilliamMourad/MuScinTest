@@ -15,6 +15,7 @@ target_include_directories(MuScinTest PRIVATE include)
 target_link_libraries(MuScinTest PRIVATE ${Geant4_LIBRARIES})
 
 set(SCRIPTS
+	macros/init.mac
 	macros/vis.mac
 	macros/paint_geometry.mac
 	macros/build_custom_gui.mac

@@ -21,7 +21,7 @@ void EventAction::BeginOfEventAction(const G4Event* event)
 
 void EventAction::EndOfEventAction(const G4Event* event) 
 {
-	
+
 	G4String siliconPMSDName = _eventActionParameters.siliconPMSDName;
 	G4String scintSDName = _eventActionParameters.scintSDName;
 
@@ -29,23 +29,47 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	G4String muCName = _eventActionParameters.muCName;
 
 	G4HCofThisEvent* hce = event->GetHCofThisEvent();
-	if (!hce) return;
 
 	auto SDManager = G4SDManager::GetSDMpointer();
 
-	G4int siliconPM_op_HCID = SDManager->GetCollectionID(opCName);
-	// G4int scintSD_HCID = sdManager->GetCollectionID(scintSDName + "/HitsCollection");
-	
+	if (!hce) return;
+
+	// Get HCID once 
+	if (siliconPM_op_HCID < 0)
+	{
+		siliconPM_op_HCID = SDManager->GetCollectionID(opCName); // good
+
+		// Querying the HCID this way is the best way to ask for errors,
+		// I'll just let it slide this time (maybe i'll fix it later)
+		scint_edep_HCID = SDManager->GetCollectionID("ScintillatorMFD/Edep"); // bad
+		scint_muPathLength_HCID = SDManager->GetCollectionID("ScintillatorMFD/MuPathLength"); // bad
+		coating_edep_HCID = SDManager->GetCollectionID("CoatingMFD/Edep"); // bad
+	}
+
 	auto siliconPMSD_HC = hce->GetHC(siliconPM_op_HCID);
-	// auto scintSD_HC = hce->GetHC(scintSD_HCID);
-	
+	auto scint_edep_HC = hce->GetHC(scint_edep_HCID);
+	auto scint_muPathLength_HC = hce->GetHC(scint_muPathLength_HCID);
+	auto coating_edep_HC = hce->GetHC(coating_edep_HCID);
+
+	auto* map_scint_edep_HC = static_cast<G4THitsMap<G4double>*>(scint_edep_HC);
+	auto* map_scint_muPathLength_HC = static_cast<G4THitsMap<G4double>*>(scint_muPathLength_HC);
+	auto* map_coating_edep_HC = static_cast<G4THitsMap<G4double>*>(coating_edep_HC);
 
 	// From here on, i'll just fill the root structures with the data,
 	// you shall expect to see lots of ugly loops, I know, but I'll leave optimization for another time...
+
+	G4int nScintHits = 0;
+	G4int nCerHits = 0;
+	G4double scintEdep = SumOverHC(map_scint_edep_HC);
+	G4double scintMuPathLength = SumOverHC(map_scint_muPathLength_HC);
+	G4double coatingEdep = SumOverHC(map_coating_edep_HC);
+
+	// Analyze & Store in Histograms
+	#pragma region Histograms
+
 	if (siliconPMSD_HC) {
-
 		G4int nHits = siliconPMSD_HC->GetSize();
-
+		
 
 		for (G4int i = 0; i < nHits; i++) {
 			auto hit = static_cast<OpticalPhotonHit*>(siliconPMSD_HC->GetHit(i));
@@ -61,23 +85,42 @@ void EventAction::EndOfEventAction(const G4Event* event)
 				analysisManager->FillH1(0, edep / eV); // Scint OP Energy 
 				analysisManager->FillH1(2, time / ns); // Scint OP Time
 				analysisManager->FillH2(0, position.x() / mm, position.y() / mm); // Scint OP Spread
+				nScintHits++;
 			} else if (process == "Cerenkov") {
 				analysisManager->FillH1(1, edep / eV); // Cer OP Energy
 				analysisManager->FillH1(3, time / ns); // Cer OP Time
-				analysisManager->FillH2(1, position.x() / mm, position.y() / mm); // Scint OP Spread
+				analysisManager->FillH2(1, position.x() / mm, position.y() / mm); // Cer OP Spread
+				nCerHits++;
 			}
 
 			analysisManager->FillH1(4, nReflectionsAtCoating); // OP Reflections
 		}
-	} 
+	}
 
-	/*if (scintSD_HC) {
+	#pragma endregion Histograms
 
-		G4cout << "Scintillator Hits Collection: " << scintSD_HC->GetName() << G4endl;
-		G4cout << "Number of hits: " << scintSD_HC->GetSize() << G4endl;
-	} else {
-		G4cout << "No Scintillator Hits Collection found." << G4endl;
-	}*/
-	
+	// Analyze & Store in NTuples
+	#pragma region Ntuples
+		
+	if (siliconPMSD_HC && scint_edep_HC && scint_muPathLength_HC && coating_edep_HC)
+	{
+		analysisManager->FillNtupleDColumn(0, event->GetEventID());		// eventID
+		analysisManager->FillNtupleDColumn(1, nScintHits);				// scint OP hits
+		analysisManager->FillNtupleDColumn(2, nCerHits);				// cer OP hits
+		analysisManager->FillNtupleDColumn(3, scintEdep / eV);				// scint edep
+		analysisManager->FillNtupleDColumn(4, 0.0 / eV);						// siPM edep
+		analysisManager->FillNtupleDColumn(5, coatingEdep / eV);				// coating edep
+		analysisManager->FillNtupleDColumn(6, scintMuPathLength / mm);		// scint mu path length
+		analysisManager->AddNtupleRow();
+	}
+
+	#pragma endregion Ntuples
 }
 
+G4double EventAction::SumOverHC(const G4THitsMap<G4double>* hm)
+{
+	G4double sum = 0.;
+	if (!hm) return 0.;
+	for (const auto& kv : *hm->GetMap()) sum += *(kv.second);
+	return sum;
+}

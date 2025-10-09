@@ -1,10 +1,15 @@
 #include "DetectorConstruction.hh"
 #include "SiliconPMSD.hh"
+#include "PrimaryMuonFilter.hh"
 
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
+
 #include "G4SDManager.hh"
+#include "G4MultiFunctionalDetector.hh"
+#include "G4PSEnergyDeposit.hh"
+#include "G4PSPassageTrackLength.hh"
 
 #include "G4SystemOfUnits.hh"
 
@@ -504,13 +509,62 @@ void DetectorConstruction::DefineSiPMMaterial()
 // For more information on how these works check https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/Detector/hit.html?highlight=sensitive%20detectors#sensitive-detector
 void DetectorConstruction::ConstructSDandField() 
 {
+	auto* sdManager = G4SDManager::GetSDMpointer();
+
+	// Set the following filter to ignore non-primary muons,
+	// be careful that muplus are also ignored.
+	auto* muFilter = new PrimaryMuonFilter("PrimaryMuFilter");
+	
+
+	#pragma region Scintillator MFD
+	
+	G4MultiFunctionalDetector* scintMFD = new G4MultiFunctionalDetector("ScintillatorMFD");
+	sdManager->AddNewDetector(scintMFD);
+	
+	// I set these primitive scorers according to the data i want to collect (check the README.md file for that)
+	G4PSEnergyDeposit* scintPSedep = new G4PSEnergyDeposit("Edep");
+	scintPSedep->SetFilter(muFilter); // to get all particles edep comment out this line
+	scintMFD->RegisterPrimitive(scintPSedep);
+	
+	G4PSPassageTrackLength* scintPSmuPathLength = new G4PSPassageTrackLength("MuPathLength");
+	scintPSmuPathLength->SetFilter(muFilter);
+	scintMFD->RegisterPrimitive(scintPSmuPathLength);
+
+	SetSensitiveDetector("ScintLogic", scintMFD);
+	
+	#pragma endregion Scintillator MFD
+
+	
+	#pragma region Coating MFD
+	
+	// It is also possible to add a MFD for each physical copy of the same logical volume
+	// but i'm not doing that now since it is not a priority for the purposes of this simulation.
+	G4MultiFunctionalDetector* coatingMFD = new G4MultiFunctionalDetector("CoatingMFD");
+	sdManager->AddNewDetector(coatingMFD);
+
+	// I set these primitive scorers according to the data i want to collect (check the README.md file for that)
+	G4PSEnergyDeposit* coatingPSedep = new G4PSEnergyDeposit("Edep");
+	coatingPSedep->SetFilter(muFilter); // to get all particles edep comment out this line
+	coatingMFD->RegisterPrimitive(coatingPSedep);
+
+	SetSensitiveDetector("XCoatLogic", coatingMFD);
+	SetSensitiveDetector("YCoatLogic", coatingMFD);
+	SetSensitiveDetector("FrontCoatLogic", coatingMFD);
+
+	#pragma endregion Coating MFD
+
+
+	#pragma region SiPM SD & MFD
+	
 	G4String siliconPMSDName = _siliconPMSDName;
 	G4String opCName = _opCName;
 	
 	SiliconPMSD* siliconPMSD = new SiliconPMSD(siliconPMSDName, opCName);
-	G4SDManager::GetSDMpointer()->AddNewDetector(siliconPMSD);
+	sdManager->AddNewDetector(siliconPMSD);
 	
 	// Assign the SiPMSD to the SiPM logical volume
 	SetSensitiveDetector("SiPMLogic", siliconPMSD); // builtin method of G4VUserDetectorConstruction
+
+	#pragma endregion SiPM SD & MFD
 
 }

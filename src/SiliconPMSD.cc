@@ -23,7 +23,7 @@ void SiliconPMSD::Initialize(G4HCofThisEvent* hce)
 	// SensitiveDetectorName is a variable of G4VSensitiveDetector
 	opHitsCollection = new G4THitsCollection<OpticalPhotonHit>(SensitiveDetectorName, collectionName[0]);
 
-	G4int hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+	hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
 	hce->AddHitsCollection(hcID, opHitsCollection);
 }
 
@@ -34,7 +34,6 @@ G4bool SiliconPMSD::ProcessHits(G4Step* step, G4TouchableHistory* history)
 
 	// Filter out non optical photons
 	if (track->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition()) return false;
-
 
 	// Get the process that created the optical photon
 	G4String creatorProcess = "none";
@@ -82,7 +81,7 @@ G4bool SiliconPMSD::ProcessHits(G4Step* step, G4TouchableHistory* history)
 
 void SiliconPMSD::EndOfEvent(G4HCofThisEvent* hce)
 {
-	G4int hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
+	// G4int hcID = G4SDManager::GetSDMpointer()->GetCollectionID(collectionName[0]);
 	auto hc = static_cast<G4THitsCollection<OpticalPhotonHit>*>(hce->GetHC(hcID));
 
 	// The following block is for debug purposes
