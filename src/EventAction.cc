@@ -53,6 +53,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
 			auto edep = hit->GetEdep();
 			auto time = hit->GetTime();
 			auto position = hit->GetPosition();
+			auto nReflections = hit->GetNReflections();
+			auto nReflectionsAtCoating = hit->GetNReflectionsAtCoating();
 
 			// dont forget to remove the g4 units
 			if (process == "Scintillation") {
@@ -65,6 +67,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 				analysisManager->FillH2(1, position.x() / mm, position.y() / mm); // Scint OP Spread
 			}
 
+			analysisManager->FillH1(4, nReflectionsAtCoating); // OP Reflections
 		}
 	} 
 

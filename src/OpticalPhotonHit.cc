@@ -30,6 +30,16 @@ void OpticalPhotonHit::SetPosition(G4ThreeVector position)
 	_position = position;
 }
 
+void OpticalPhotonHit::SetNReflections(G4int nReflections)
+{
+	_nReflections = nReflections;
+}
+
+void OpticalPhotonHit::SetNReflectionsAtCoating(G4int nReflectionsAtCoating)
+{
+	_nReflectionsAtCoating = nReflectionsAtCoating;
+}
+
 
 G4ThreadLocal G4Allocator<OpticalPhotonHit>* OpticalPhotonHitAllocator = nullptr;
 

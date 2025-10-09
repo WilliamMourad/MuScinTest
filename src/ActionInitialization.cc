@@ -5,12 +5,16 @@
 ActionInitialization::ActionInitialization(
 	PrimaryGeneratorActionParameters primaryGeneratorActionParameters,
 	RunActionParameters runActionParameters,
-	EventActionParameters eventActionParameters
+	EventActionParameters eventActionParameters,
+	TrackingActionParameters trackingActionParameters,
+	SteppingActionParameters steppingActionParameters
 ) : G4VUserActionInitialization() 
 {
 	_primaryGeneratorActionParameters = primaryGeneratorActionParameters;
 	_runActionParameters = runActionParameters;
 	_eventActionParameters = eventActionParameters;
+	_trackingActionParameters = trackingActionParameters;
+	_steppingActionParameters = steppingActionParameters;
 }
 
 ActionInitialization::~ActionInitialization() {}
@@ -19,7 +23,7 @@ ActionInitialization::~ActionInitialization() {}
 // omitting this brings issues with data collection.
 void ActionInitialization::BuildForMaster() const 
 {
-	SetUserAction(new RunAction(_runActionParameters));  
+	SetUserAction(new RunAction(_runActionParameters));
 }
 
 void ActionInitialization::Build() const 
@@ -27,4 +31,6 @@ void ActionInitialization::Build() const
     SetUserAction(new PrimaryGeneratorAction(_primaryGeneratorActionParameters));
     SetUserAction(new RunAction(_runActionParameters));
 	SetUserAction(new EventAction(_eventActionParameters));
+	SetUserAction(new TrackingAction(_trackingActionParameters));
+	SetUserAction(new SteppingAction(_steppingActionParameters));
 }

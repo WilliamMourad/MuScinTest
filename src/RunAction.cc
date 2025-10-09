@@ -20,6 +20,8 @@ RunAction::RunAction(RunActionParameters runActionParameters)
 
 	analysisManager->CreateH2("ScintOpticalPhotonsSpread", "Scint Optical Photons Spread; X (mm); Y (mm)", 1000, -40, 40, 1000, -40, 40);
 	analysisManager->CreateH2("CerOpticalPhotonsSpread", "Cer Optical Photons Spread; X (mm); Y (mm)", 1000, -40, 40, 1000, -40, 40);
+
+	analysisManager->CreateH1("OpticalPhotonsReflections", "Optical Photons Reflections", 10, 0, 10);
 }
 
 RunAction::~RunAction()

@@ -19,12 +19,16 @@ public:
 	void SetProcess(G4String process);
 	void SetPosition(G4ThreeVector position);
 	void SetTime(G4double time);
+	void SetNReflections(G4int nReflections);
+	void SetNReflectionsAtCoating(G4int nReflectionsAtCoating);
 
 
 	G4double GetEdep() const { return _edep; }
 	G4String GetProcess() const { return _process; }
 	G4double GetTime() const { return _time; }
 	G4ThreeVector GetPosition() const { return _position; }
+	G4int GetNReflections() const { return _nReflections; }
+	G4int GetNReflectionsAtCoating() const { return _nReflectionsAtCoating; }
 
 private:
 	G4int _eventID;
@@ -32,6 +36,8 @@ private:
 	G4String _process;
 	G4double _time;
 	G4ThreeVector _position;
+	G4int _nReflections;
+	G4int _nReflectionsAtCoating;
 };
 
 // Memory allocation handler (required for hits collections)

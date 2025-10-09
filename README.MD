@@ -25,7 +25,7 @@ With that in mind i implemented a simple geometry configuration (following the s
 
 This is the workflow i usually follow when working in Geant4:
 1. program geometry, materials, optical properties and primary generator actions, check that everything works as expected.
-2. program SDs, run actions, event actions, stepping actions to export data from the simulation, verify that the data matches the theory.
+2. program SDs, run / event / tracxking / stepping actions to export data from the simulation, verify that the data matches the theory.
 
 
 # Observations  
@@ -127,3 +127,4 @@ After veryfing the correct implementation of the detector it will be used in the
 - 2025-10-01: Initial commit, initialized the project with the macro file i wrote for the LabA experience i was working on.
 - 2025-10-04: Successfully implemented the geometry (materials, optical properties, physical objects), now i plan to implement the detection logic.
 - 2025-10-08: Successfully implemented the SiPM SD, run action and event action to plot optical photons data, now i'll add the tracking action to sample the reflections of the optical photons.
+- 2025-10-09: Successfully implemented the tracking logic to sample the reflections of the optical photons, now i'll take care of the energy deposition.

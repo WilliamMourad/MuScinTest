@@ -7,6 +7,8 @@
 #include "PrimaryGeneratorAction.hh"
 #include "RunAction.hh"
 #include "EventAction.hh"
+#include "TrackingAction.hh"
+#include "SteppingAction.hh"
 #include "ActionInitialization.hh"
 
 // Physics 
@@ -136,6 +138,9 @@ int main(int argc, char** argv) {
 		muCName
 	};
 
+	TrackingActionParameters trackingActionParameters = TrackingActionParameters{};
+	SteppingActionParameters steppingActionParameters = SteppingActionParameters{};
+
 	#pragma endregion User Actions Definition
 	
 
@@ -144,7 +149,9 @@ int main(int argc, char** argv) {
 	runManager->SetUserInitialization(new ActionInitialization(
 		primaryGeneratorActionParameters,
 		runActionParameters,
-		eventActionParameters
+		eventActionParameters,
+		trackingActionParameters,
+		steppingActionParameters
 	));
 
 	runManager->Initialize();

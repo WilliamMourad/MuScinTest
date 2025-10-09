@@ -5,6 +5,8 @@
 #include "G4OpticalPhoton.hh" // not to be confused with OpticalPhotonHit.hh
 #include "G4RunManager.hh"
 
+#include "OpticalPhotonTrackInfo.hh"
+
 
 SiliconPMSD::SiliconPMSD(const G4String& name, G4String cName) : G4VSensitiveDetector(name), opHitsCollection(nullptr)
 {
@@ -52,6 +54,11 @@ G4bool SiliconPMSD::ProcessHits(G4Step* step, G4TouchableHistory* history)
 		}
 	}
 
+	// Retrieve info (reflections) from the track user information
+	auto* trackInfo = static_cast<OpticalPhotonTrackInfo*>(track->GetUserInformation());
+	G4int nReflections = trackInfo ? trackInfo->nReflections : 0;
+	G4int nReflectionsAtCoating = trackInfo ? trackInfo->nReflectionsAtCoating : 0;
+
 
 	OpticalPhotonHit* opHit = new OpticalPhotonHit();
 	opHit->SetEventID(eventID);
@@ -59,6 +66,8 @@ G4bool SiliconPMSD::ProcessHits(G4Step* step, G4TouchableHistory* history)
 	opHit->SetProcess(creatorProcess);
 	opHit->SetTime(track->GetGlobalTime());
 	opHit->SetPosition(step->GetPreStepPoint()->GetPosition());
+	opHit->SetNReflections(nReflections);
+	opHit->SetNReflectionsAtCoating(nReflectionsAtCoating);
 
 	// add the number of reflections of the optical photon with the coating surface 
 

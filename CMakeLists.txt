@@ -28,4 +28,3 @@ foreach(_script ${SCRIPTS})
 		COPYONLY
 	)
 endforeach()
-

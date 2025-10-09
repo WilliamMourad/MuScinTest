@@ -159,6 +159,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	canvas->SaveAs("CerOpticalPhotonsSpread.png");
 
+    
+    TH1D* h7 = (TH1D*)f.Get("OpticalPhotonsReflections");
+    if (!h7) {
+        MessageBox(NULL, "Failed to retrieve histogram h7", "Error", MB_ICONERROR);
+        return -1;
+    }
+    h7->SetFillColor(kBlue - 10);
+    h7->SetLineColor(kBlue + 2);
+    h7->SetLineWidth(2);
+    h7->Draw("hist");
+    h7->GetXaxis()->SetTitle("Reflections");
+    h7->GetYaxis()->SetTitle("Frequency");
+    h7->SetTitle("Optical Photons Reflections");
+    canvas->Update();
+
+    canvas->SaveAs("OpticalPhotonsReflections.png");
+
 
 
     // Connect the canvas's "Closed" signal to terminate the application
