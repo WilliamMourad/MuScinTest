@@ -222,6 +222,32 @@ G4VPhysicalVolume* DetectorConstruction::BuildGeometry()
 
 		#pragma endregion SiPM Geometry
 	
+
+	// This was a test for a split of the SiPM into SiPM bulk and SiPM photodetector,
+	// it was meant to sample optical properties and edep separately,
+	// but in the end i went for a parallel world since with this method i had to sacrifice cerenkov optics.
+	// 
+	// G4Box* siPMBulkSolid = new G4Box(
+	// 	"SiPMBulkSolid",
+	// 	plateSizeX / 2,
+	// 	plateSizeY / 2,
+	// 	siPMThickenss / 2 * 0.9
+	// );
+	// G4LogicalVolume* siPMBulkLogic = new G4LogicalVolume(siPMBulkSolid, sipm_material, "SiPMBulkLogic");
+	// G4ThreeVector siPMBulkPosition = G4ThreeVector(0, 0, plateThickness / 2 + siPMThickenss / 2 * 0.9 + gap);
+	// 
+	// G4VPhysicalVolume* siPMBulkPhysical = new G4PVPlacement(
+	// 	nullptr,
+	// 	siPMBulkPosition,
+	// 	siPMBulkLogic,
+	// 	"SiPMBulkPhysical",
+	// 	worldLogic,
+	// 	false,
+	// 	0,
+	// 	true
+	// );
+
+
 	#pragma endregion Geometry Definitions & Placements
 
 	// Boundary Surfaces Definitions
@@ -363,21 +389,28 @@ void DetectorConstruction::DefineScintillatorMaterial()
 	// (For more information on scintillation check https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/TrackingAndPhysics/physicsProcess.html#optical-photon-processes)
 	#pragma region Scintillator Optical Properties Definition
 
-	const G4int nEntries = 3; // for simplicity im using a 3 point spectrum but i may increase it later
+	// const G4int nEntries = 3; // for simplicity im using a 3 point spectrum but i may increase it later
+	const G4int nEntries = 20; // finally i went for a 20 point spectrum, it should be more than enough
 	const G4double sFactor = _scintData.scalingFactor;
 	const G4double sYield = _scintData.scintYield;
-	const G4double WLpeak = _scintData.waveLengthPeak;
-	const G4double WL_L = _scintData.waveLengthLeft;
-	const G4double WL_R = _scintData.waveLengthRight;
+	const G4double WLpeak = _scintData.waveLengthPeak;	// These values are not used with the current spectrum definition.
+	const G4double WL_L = _scintData.waveLengthLeft;	// I plan to implement a function to generate an arbitrary dense spectrum
+	const G4double WL_R = _scintData.waveLengthRight;	// using these values in a future revision of the code
 	const G4double dTime = _scintData.decayTime;
 	const G4double rIndex = _scintData.refractiveIndex;
 	const G4double absLength = _scintData.absorptionLength;
 
+	// These will eventually be sampled with arbitrary density from a function using the WLpeak, WL_L and WL_R values
+	G4double scintPhotonEnergy[nEntries] = { 2.431*eV, 2.480*eV,2.531*eV,2.583*eV,2.611*eV,2.638*eV,2.667*eV,2.696*eV,2.725*eV,2.756*eV,2.787*eV,2.818*eV,2.851*eV,2.884*eV,2.918*eV,2.952*eV,2.988*eV,3.024*eV,3.062*eV,3.100*eV };
+	G4double scintEmission[nEntries] = { 0.0127,0.0154,0.0200,0.0272,0.0318,0.0381,0.0454,0.0544,0.0635,0.0726,0.0817,0.0889,0.0907,0.0889,0.0835,0.0708,0.0526,0.0345,0.0181,0.0091 };
+	G4double scintRefractiveIndex[nEntries] = { rIndex , rIndex , rIndex , rIndex , rIndex , rIndex , rIndex, rIndex, rIndex, rIndex, rIndex, rIndex, rIndex, rIndex, rIndex, rIndex, rIndex, rIndex, rIndex, rIndex };
+	G4double scintAbsLength[nEntries] = { absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength, absLength };
 
-	G4double scintPhotonEnergy[nEntries] = { WL_R, WLpeak, WL_L};		// wavelength of the emitted optical photons
-	G4double scintEmission[nEntries] = { 0.1, 1, 0.1 };							// relative intensity of the emitted optical photons
-	G4double scintRefractiveIndex[nEntries] = { rIndex , rIndex , rIndex };		// refractive index of the scintillator (per energy)
-	G4double scintAbsLength[nEntries] = { absLength, absLength, absLength };	// absorption length of the scintillator (per energy)
+	// At first i used a 3 point spectrum for simplicity
+	// G4double scintPhotonEnergy[nEntries] = { WL_R, WLpeak, WL_L};				// wavelength of the emitted optical photons
+	// G4double scintEmission[nEntries] = { 0.1, 1, 0.1 };							// relative intensity of the emitted optical photons
+	// G4double scintRefractiveIndex[nEntries] = { rIndex , rIndex , rIndex };		// refractive index of the scintillator (per energy)
+	// G4double scintAbsLength[nEntries] = { absLength, absLength, absLength };		// absorption length of the scintillator (per energy)
 
 	G4MaterialPropertiesTable* scintMPT = new G4MaterialPropertiesTable();
 
@@ -405,11 +438,14 @@ void DetectorConstruction::DefineScintillatorMaterial()
 	scint_surface->SetModel(unified);
 	
 	// This is equivalent to 1 - absorption, therefore a value of 1 means no absorption at all
-	G4double reflectivity[nEntries] = { 1., 1., 1. }; // I will probably switch to vectors in a future revision
+
+	const G4int rNEntries = 2;
+	G4double reflectivity[rNEntries] = { 1., 1. }; // I will probably switch to vectors in a future revision
 	
+	G4double reflectivityPhotonEnergy[rNEntries] = { 1. * eV, 10. * eV };
 	G4MaterialPropertiesTable* scintSurfaceMPT = new G4MaterialPropertiesTable();
 
-	scintSurfaceMPT->AddProperty("REFLECTIVITY", scintPhotonEnergy, reflectivity, nEntries);
+	scintSurfaceMPT->AddProperty("REFLECTIVITY", reflectivityPhotonEnergy, reflectivity, rNEntries);
 	
 	scint_surface->SetMaterialPropertiesTable(scintSurfaceMPT);
 
@@ -566,5 +602,14 @@ void DetectorConstruction::ConstructSDandField()
 	SetSensitiveDetector("SiPMLogic", siliconPMSD); // builtin method of G4VUserDetectorConstruction
 
 	#pragma endregion SiPM SD & MFD
+
+	// Test SiPM Bulk MFD
+	// G4MultiFunctionalDetector* siPMBulkMFD = new G4MultiFunctionalDetector("SiPMBulkMFD");
+	// sdManager->AddNewDetector(siPMBulkMFD);
+	// 
+	// G4PSEnergyDeposit* siPMBulkPSedep = new G4PSEnergyDeposit("Edep");
+	// siPMBulkPSedep->SetFilter(muFilter); // to get all particles edep comment out this line
+	// siPMBulkMFD->RegisterPrimitive(siPMBulkPSedep);
+	// SetSensitiveDetector("SiPMBulkLogic", siPMBulkMFD);
 
 }

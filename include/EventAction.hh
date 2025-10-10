@@ -34,5 +34,5 @@ private:
 	G4int scint_edep_HCID			= -1;
 	G4int scint_muPathLength_HCID	= -1;
 	G4int coating_edep_HCID			= -1;
-
+	G4int siliconPM_edep_HCID		= -1;
 };

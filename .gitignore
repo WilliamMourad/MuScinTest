@@ -1,4 +1,5 @@
 out/
 .vs/
+collected_data/
 .DS_Store
 reference.pur

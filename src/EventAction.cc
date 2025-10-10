@@ -44,16 +44,20 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		scint_edep_HCID = SDManager->GetCollectionID("ScintillatorMFD/Edep"); // bad
 		scint_muPathLength_HCID = SDManager->GetCollectionID("ScintillatorMFD/MuPathLength"); // bad
 		coating_edep_HCID = SDManager->GetCollectionID("CoatingMFD/Edep"); // bad
+		// this one comes from the parallel world
+		siliconPM_edep_HCID = SDManager->GetCollectionID("GhostSiPMMFD/Edep"); // bad
 	}
 
 	auto siliconPMSD_HC = hce->GetHC(siliconPM_op_HCID);
 	auto scint_edep_HC = hce->GetHC(scint_edep_HCID);
 	auto scint_muPathLength_HC = hce->GetHC(scint_muPathLength_HCID);
 	auto coating_edep_HC = hce->GetHC(coating_edep_HCID);
+	auto siliconPM_edep_HC = hce->GetHC(siliconPM_edep_HCID);
 
 	auto* map_scint_edep_HC = static_cast<G4THitsMap<G4double>*>(scint_edep_HC);
 	auto* map_scint_muPathLength_HC = static_cast<G4THitsMap<G4double>*>(scint_muPathLength_HC);
 	auto* map_coating_edep_HC = static_cast<G4THitsMap<G4double>*>(coating_edep_HC);
+	auto* map_siliconPM_edep_HC = static_cast<G4THitsMap<G4double>*>(siliconPM_edep_HC);
 
 	// From here on, i'll just fill the root structures with the data,
 	// you shall expect to see lots of ugly loops, I know, but I'll leave optimization for another time...
@@ -63,6 +67,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	G4double scintEdep = SumOverHC(map_scint_edep_HC);
 	G4double scintMuPathLength = SumOverHC(map_scint_muPathLength_HC);
 	G4double coatingEdep = SumOverHC(map_coating_edep_HC);
+	G4double siliconPMEdep = SumOverHC(map_siliconPM_edep_HC);
 
 	// Analyze & Store in Histograms
 	#pragma region Histograms
@@ -107,10 +112,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		analysisManager->FillNtupleDColumn(0, event->GetEventID());		// eventID
 		analysisManager->FillNtupleDColumn(1, nScintHits);				// scint OP hits
 		analysisManager->FillNtupleDColumn(2, nCerHits);				// cer OP hits
-		analysisManager->FillNtupleDColumn(3, scintEdep / eV);				// scint edep
-		analysisManager->FillNtupleDColumn(4, 0.0 / eV);						// siPM edep
-		analysisManager->FillNtupleDColumn(5, coatingEdep / eV);				// coating edep
-		analysisManager->FillNtupleDColumn(6, scintMuPathLength / mm);		// scint mu path length
+		analysisManager->FillNtupleDColumn(3, scintEdep / eV);			// scint edep
+		analysisManager->FillNtupleDColumn(4, siliconPMEdep / eV);		// siPM edep
+		analysisManager->FillNtupleDColumn(5, coatingEdep / eV);		// coating edep
+		analysisManager->FillNtupleDColumn(6, scintMuPathLength / mm);	// scint mu path length
 		analysisManager->AddNtupleRow();
 	}
 

@@ -3,6 +3,7 @@
 #include "G4MTRunManager.hh"
 
 // My classes
+#include "ParallelWorld.hh"
 #include "DetectorConstruction.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "RunAction.hh"
@@ -15,6 +16,7 @@
 #include "FTFP_BERT.hh"
 #include "G4OpticalPhysics.hh"
 #include "G4OpticalParameters.hh"
+#include "G4ParallelWorldPhysics.hh"
 
 // Visualization and UI
 #include "G4VisExecutive.hh"
@@ -97,12 +99,14 @@ int main(int argc, char** argv) {
 
 	auto physicsList = new FTFP_BERT;
 	
-	auto optPhysics = new G4OpticalPhysics();
+	auto pwPhysics = new G4ParallelWorldPhysics("ParallelWorld");
 
+	auto optPhysics = new G4OpticalPhysics();
 	auto optParams = G4OpticalParameters::Instance();
 	// optParams->SetScintTrackSecondariesFirst(true);
 
 	physicsList->RegisterPhysics(optPhysics);
+	physicsList->RegisterPhysics(pwPhysics);
 	physicsList->SetVerboseLevel(1);
 	
 	# pragma endregion PhysicsList Definition & Initialization
@@ -121,6 +125,15 @@ int main(int argc, char** argv) {
 		opCName,
 		muCName
 	);
+
+	ParallelWorld* parallelWorld = new ParallelWorld(
+		"ParallelWorld",
+		scintGeometry.sizeZ,
+		siPMThickness,
+		gap
+	);
+
+	detectorConstruction->RegisterParallelWorld(parallelWorld);
 
 	#pragma endregion DetectorConstruction Definition & Initialization
 

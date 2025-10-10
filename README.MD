@@ -131,3 +131,4 @@ After veryfing the correct implementation of the detector it will be used in the
 - 2025-10-08: Successfully implemented the SiPM SD, run action and event action to plot optical photons data, now i'll add the tracking action to sample the reflections of the optical photons.
 - 2025-10-09: Successfully implemented the tracking logic to sample the reflections of the optical photons, now i'll take care of the energy deposition.
 - 2025-10-09: Successfully implemented the energy deposition logic + muon path length sampling.
+- 2025-10-10: Implemented SiPM edep detection using parallel world, tweaked some parameters to improve the simulation output.
