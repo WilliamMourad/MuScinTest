@@ -25,7 +25,7 @@ With that in mind i implemented a simple geometry configuration (following the s
 
 This is the workflow i usually follow when working in Geant4:
 1. program geometry, materials, optical properties and primary generator actions, check that everything works as expected.
-2. program SDs, MVD, run / event / tracxking / stepping actions to export data from the simulation, verify that the data matches the theory.
+2. program SDs, MVD, run / event / tracking / stepping actions to export data from the simulation, verify that the data matches the theory.
 
 
 # Observations  

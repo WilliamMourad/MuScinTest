@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 
 	// The thickness of the reflective coating has yet to be formally established
 	// but for the purposes of this project any reasonable value will do
-	G4double coatingThickness = 0.1 * mm;
+	G4double coatingThickness = 50 * um;
 	G4double siPMThickness = 3 * mm;
 
 	// The size of the scintillator has yet to be formally established
@@ -78,6 +78,30 @@ int main(int argc, char** argv) {
 		3.3 * ns,		// decayTime
 		1.58,			// refractiveIndex
 		210. * cm,		// absorptionLength
+	};
+
+	// These values are used in the primary generator action
+	G4String particleName = "mu-";
+
+	ParticleGunSettings gunSettings = ParticleGunSettings{
+		false,							// isActive
+		1,								// particleN
+		55 * MeV,						// particleEnergy
+		{0, 0, -2.5 * cm},				// gunPosition
+		{0, 0, 1}						// gunDirection
+	};
+
+	GPSSettings gpsSettings = GPSSettings{
+		true,							// isActive
+		1,								// particleN
+		55 * MeV,						// particleMeanEnergy
+		1 * MeV,						// particleEnergySigma
+		{0, 0, -2.5 * cm},				// gpsPosition
+		0.6 * cm,						// gpsRadius
+		{1, 0, 0},						// gpsRot1
+		{0, -1, 0},						// gpsRot2
+		0.01,							// beamApertureX
+		0.01							// beamApertureY
 	};
 
 	#pragma endregion Simulation Parameters
@@ -140,7 +164,11 @@ int main(int argc, char** argv) {
 
 	#pragma region User Actions Definition
 
-	PrimaryGeneratorActionParameters primaryGeneratorActionParameters = PrimaryGeneratorActionParameters{};
+	PrimaryGeneratorActionParameters primaryGeneratorActionParameters = PrimaryGeneratorActionParameters{
+		particleName,
+		gunSettings,
+		gpsSettings
+	};
 	
 	RunActionParameters runActionParameters = RunActionParameters{};
 	
