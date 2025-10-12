@@ -32,6 +32,8 @@ RunAction::RunAction(RunActionParameters runActionParameters)
 	analysisManager->CreateNtupleDColumn("SiPMTotalEdep");
 	analysisManager->CreateNtupleDColumn("CoatingTotalEdep");
 	analysisManager->CreateNtupleDColumn("MuPathLength");
+	analysisManager->CreateNtupleDColumn("MuonHitX");
+	analysisManager->CreateNtupleDColumn("MuonHitY");
 	analysisManager->FinishNtuple();
 }
 

@@ -28,9 +28,14 @@ void ActionInitialization::BuildForMaster() const
 
 void ActionInitialization::Build() const 
 {
+	
+	// instantiate actions here
+
+	auto* eventAction = new EventAction(_eventActionParameters);
+
     SetUserAction(new PrimaryGeneratorAction(_primaryGeneratorActionParameters));
     SetUserAction(new RunAction(_runActionParameters));
-	SetUserAction(new EventAction(_eventActionParameters));
-	SetUserAction(new TrackingAction(_trackingActionParameters));
+	SetUserAction(eventAction);
+	SetUserAction(new TrackingAction(_trackingActionParameters, eventAction));
 	SetUserAction(new SteppingAction(_steppingActionParameters));
 }

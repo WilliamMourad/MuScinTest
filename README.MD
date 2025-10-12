@@ -132,3 +132,6 @@ After veryfing the correct implementation of the detector it will be used in the
 - 2025-10-09: Successfully implemented the tracking logic to sample the reflections of the optical photons, now i'll take care of the energy deposition.
 - 2025-10-09: Successfully implemented the energy deposition logic + muon path length sampling.
 - 2025-10-10: Implemented SiPM edep detection using parallel world, tweaked some parameters to improve the simulation output.
+- 2025-10-11: Implemented support for GPS.
+- 2025-10-12: Improved the tracking logic to collect the positions of muons entering the scintillator volume.
+(the project is close to completion, now it will undergo a validation process)

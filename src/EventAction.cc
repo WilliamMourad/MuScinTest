@@ -23,10 +23,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
 {
 
 	G4String siliconPMSDName = _eventActionParameters.siliconPMSDName;
-	G4String scintSDName = _eventActionParameters.scintSDName;
 
 	G4String opCName = _eventActionParameters.opCName;
-	G4String muCName = _eventActionParameters.muCName;
 
 	G4HCofThisEvent* hce = event->GetHCofThisEvent();
 
@@ -68,6 +66,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	G4double scintMuPathLength = SumOverHC(map_scint_muPathLength_HC);
 	G4double coatingEdep = SumOverHC(map_coating_edep_HC);
 	G4double siliconPMEdep = SumOverHC(map_siliconPM_edep_HC);
+	G4double muonHitX = muonLocalEntryPosition.x();
+	G4double muonHitY = muonLocalEntryPosition.y();
 
 	// Analyze & Store in Histograms
 	#pragma region Histograms
@@ -90,6 +90,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
 				analysisManager->FillH1(0, edep / eV); // Scint OP Energy 
 				analysisManager->FillH1(2, time / ns); // Scint OP Time
 				analysisManager->FillH2(0, position.x() / mm, position.y() / mm); // Scint OP Spread
+				// Eventually this could be added also for Cerenkov photons 
+				analysisManager->FillH1(4, nReflectionsAtCoating); // OP Reflections
 				nScintHits++;
 			} else if (process == "Cerenkov") {
 				analysisManager->FillH1(1, edep / eV); // Cer OP Energy
@@ -98,7 +100,6 @@ void EventAction::EndOfEventAction(const G4Event* event)
 				nCerHits++;
 			}
 
-			analysisManager->FillH1(4, nReflectionsAtCoating); // OP Reflections
 		}
 	}
 
@@ -116,10 +117,25 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		analysisManager->FillNtupleDColumn(4, siliconPMEdep / eV);		// siPM edep
 		analysisManager->FillNtupleDColumn(5, coatingEdep / eV);		// coating edep
 		analysisManager->FillNtupleDColumn(6, scintMuPathLength / mm);	// scint mu path length
+		analysisManager->FillNtupleDColumn(7, muonHitX / mm);			// muon X coordinate on hit
+		analysisManager->FillNtupleDColumn(8, muonHitY/ mm);			// muon Y coordinate on hit 
 		analysisManager->AddNtupleRow();
 	}
 
 	#pragma endregion Ntuples
+}
+
+void EventAction::RegisterMuonHit(G4ThreeVector localPos, G4ThreeVector globalPos, G4double tGlob)
+{
+	// For starting I will assume that only one muon is present per event.
+	// Therefore this logic will need to be revised in case of multiple muons.
+	// To avoid errors in such a scenario, I will always sample just the first muon hit.
+	if (muonHitRegistered) return;
+	
+	muonHitRegistered = true;
+	muonLocalEntryPosition = localPos;
+	muonGlobalEntryPosition = globalPos;
+	muonGlobalTime = tGlob;
 }
 
 G4double EventAction::SumOverHC(const G4THitsMap<G4double>* hm)

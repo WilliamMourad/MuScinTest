@@ -21,9 +21,8 @@ DetectorConstruction::DetectorConstruction(
 	G4double siPMThickness, 
 	G4double gap,
 	G4String siliconPMSDName,
-	G4String scintSDName,
-	G4String opCName,
-	G4String muCName
+	G4String scintLVName,
+	G4String opCName
 ) : G4VUserDetectorConstruction()
 {
 	_worldSizeXYZ = worldSizeXYZ;
@@ -33,9 +32,8 @@ DetectorConstruction::DetectorConstruction(
 	_gap = gap;
 
 	_siliconPMSDName = siliconPMSDName;
-	_scintSDName = scintSDName;
+	_scintLVName = scintLVName;
 	_opCName = opCName;
-	_muCName = muCName;
 
 	nist = G4NistManager::Instance();
 }
@@ -92,7 +90,7 @@ G4VPhysicalVolume* DetectorConstruction::BuildGeometry()
 		plateSizeY / 2,
 		plateThickness / 2
 	);
-	G4LogicalVolume* scintLogic = new G4LogicalVolume(scintSolid, scint_material, "ScintLogic");
+	G4LogicalVolume* scintLogic = new G4LogicalVolume(scintSolid, scint_material, _scintLVName);
 	G4ThreeVector scintPosition = G4ThreeVector(0, 0, 0);
 
 	G4VPhysicalVolume* scintPhysical = new G4PVPlacement(

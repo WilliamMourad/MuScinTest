@@ -49,9 +49,8 @@ public:
 		G4double siPMThickness,
 		G4double gap,
 		G4String siliconPMSDName,
-		G4String scintSDName,
-		G4String opCName,
-		G4String muCName
+		G4String scintLVName,
+		G4String opCName
 	);
 	~DetectorConstruction();
 
@@ -71,10 +70,9 @@ private:
 	G4double _siPMThickness;
 	G4double _gap;
 
+	G4String _scintLVName;
 	G4String _siliconPMSDName;
-	G4String _scintSDName;
 	G4String _opCName; // The collection name used for OpticalPhotonHit collection
-	G4String _muCName; // The collection name used for MuonHit collection
 
 	G4NistManager* nist;
 

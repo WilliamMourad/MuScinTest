@@ -34,18 +34,17 @@ int main(int argc, char** argv) {
 	CLHEP::HepRandom::setTheSeed(time(NULL));
 
 
+	// A better implementation could be achieved using a json file to set these parameters (i may consider it for future projects)
 	#pragma region Simulation Parameters
-	// A better implementation could be achieved using a json file to set these parameters (i may consider it later)
 
 	G4bool enableTrackingVerbose = false;
 	G4bool enableVis = false;	// enable visualization, set to false when running heavy batch jobs
 	G4int threads = 20;			// number of threads to be used in MT mode, ignore in ST mode
 	
 	G4String siliconPMSDName = "/SiliconPM";
-	G4String scintSDName = "/Scintillator";
+	G4String scintLVName = "ScintLogic";
 
 	G4String opCName = "OpticalPhotonHitsCollection";
-	G4String muCName = "MuHitsCollection";
 
 	G4double worldSizeXYZ = 1. * m;
 	
@@ -145,9 +144,8 @@ int main(int argc, char** argv) {
 		siPMThickness,
 		gap,
 		siliconPMSDName,
-		scintSDName,
-		opCName,
-		muCName
+		scintLVName,
+		opCName
 	);
 
 	ParallelWorld* parallelWorld = new ParallelWorld(
@@ -173,14 +171,16 @@ int main(int argc, char** argv) {
 	RunActionParameters runActionParameters = RunActionParameters{};
 	
 	EventActionParameters eventActionParameters = EventActionParameters{ 
+		scintLVName,
 		siliconPMSDName, 
-		scintSDName,
 		opCName,
-		muCName
 	};
 
 	TrackingActionParameters trackingActionParameters = TrackingActionParameters{};
-	SteppingActionParameters steppingActionParameters = SteppingActionParameters{};
+
+	SteppingActionParameters steppingActionParameters = SteppingActionParameters{
+		scintLVName
+	};
 
 	#pragma endregion User Actions Definition
 	

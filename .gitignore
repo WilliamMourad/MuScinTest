@@ -1,5 +1,6 @@
 out/
 .vs/
 collected_data/
+Analyzer
 .DS_Store
 reference.pur
