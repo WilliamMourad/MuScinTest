@@ -50,7 +50,8 @@ public:
 		G4double gap,
 		G4String siliconPMSDName,
 		G4String scintLVName,
-		G4String opCName
+		G4String opCName,
+		G4bool enableCuts
 	);
 	~DetectorConstruction();
 
@@ -73,6 +74,8 @@ private:
 	G4String _scintLVName;
 	G4String _siliconPMSDName;
 	G4String _opCName; // The collection name used for OpticalPhotonHit collection
+
+	G4bool _enableCuts;
 
 	G4NistManager* nist;
 

@@ -13,6 +13,7 @@
 #include "ActionInitialization.hh"
 
 // Physics 
+#include "G4PhysListFactory.hh"
 #include "FTFP_BERT.hh"
 #include "G4OpticalPhysics.hh"
 #include "G4OpticalParameters.hh"
@@ -40,7 +41,9 @@ int main(int argc, char** argv) {
 	G4bool enableTrackingVerbose = false;
 	G4bool enableVis = false;	// enable visualization, set to false when running heavy batch jobs
 	G4int threads = 20;			// number of threads to be used in MT mode, ignore in ST mode
-	
+
+	G4bool enableCuts = false; // enable production cuts, to test different responses
+
 	G4String siliconPMSDName = "/SiliconPM";
 	G4String scintLVName = "ScintLogic";
 
@@ -94,7 +97,7 @@ int main(int argc, char** argv) {
 		true,							// isActive
 		1,								// particleN
 		55 * MeV,						// particleMeanEnergy
-		1 * MeV,						// particleEnergySigma
+		0 * MeV,						// particleEnergySigma
 		{0, 0, -2.5 * cm},				// gpsPosition
 		0.6 * cm,						// gpsRadius
 		{1, 0, 0},						// gpsRot1
@@ -120,13 +123,16 @@ int main(int argc, char** argv) {
 
 	#pragma region PhysicsList Definition & Initialization
 
-	auto physicsList = new FTFP_BERT;
+
+	G4PhysListFactory factory;
+	auto physicsList = factory.GetReferencePhysList("FTFP_BERT_EMZ");
+	// auto physicsList = new FTFP_BERT;
 	
 	auto pwPhysics = new G4ParallelWorldPhysics("ParallelWorld");
 
 	auto optPhysics = new G4OpticalPhysics();
 	auto optParams = G4OpticalParameters::Instance();
-	// optParams->SetScintTrackSecondariesFirst(true);
+	optParams->SetScintTrackSecondariesFirst(true);
 
 	physicsList->RegisterPhysics(optPhysics);
 	physicsList->RegisterPhysics(pwPhysics);
@@ -145,7 +151,8 @@ int main(int argc, char** argv) {
 		gap,
 		siliconPMSDName,
 		scintLVName,
-		opCName
+		opCName,
+		enableCuts
 	);
 
 	ParallelWorld* parallelWorld = new ParallelWorld(
@@ -168,7 +175,9 @@ int main(int argc, char** argv) {
 		gpsSettings
 	};
 	
-	RunActionParameters runActionParameters = RunActionParameters{};
+	RunActionParameters runActionParameters = RunActionParameters{
+		enableCuts
+	};
 	
 	EventActionParameters eventActionParameters = EventActionParameters{ 
 		scintLVName,

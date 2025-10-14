@@ -42,6 +42,17 @@ This background effect can be reduced in different ways:
 - a threshold on the number of detected photons can be applied (since cerenkov light output is way lower than scintillation light output),
 - a different placement of the SiPM can (and will) be studied (e.g. on the side of the scintillator plate).
 
+**3)**
+The predicted mean edep of muons inside the volumes (obtained using Bethe Bloch formula) is shifted to the right (about 1sigma) compared to the peak of the edep histograms.
+From my understanding this is expected due to the thinness of the volumes that enhances the tail of the Landau distribution.
+This can be explained by the fact that in thin plates the probability of the produced delta rays to escape the volume (therefore carrying their energy away) is higher.
+To study better this effect i used production cuts but clear conclusions are still to be drawn.
+
+**4)**
+The predicted most probable value (MPV) of the energy loss of muons inside the volumes (obtained using the Landau distribution) is shifted to the right (but less than the BB prediction) compared to the peak of the edep histograms.
+This is not expected and i am still trying to understand how to explain it, one first hypotesis is that the thickness of the plates is still too high.
+The same considerations about the production cuts apply here.
+
 ## On Geant4
 **1)**
 Without G4LogicalBorderSurface the optical photons are not reflected by the coating layer back in the scintillator (this is expected).
@@ -77,6 +88,10 @@ Can the optimization problem be solved using machine learning (Bayesian Optimiza
 Is this a valid practice or is it a niche? Are there better ways to handle optimization?
 Should i invest my time/resources practicing at it or is it something not useful in the industry?
 
+**4)**
+About production cuts and the energy deposition of muons: how can i explain observations #3 and #4 (in the "On Physics" section)?
+
+
 # Output
 ---
 Before prooceding i want to report some important considerations regarding data.
@@ -86,7 +101,7 @@ the sim requires tens of thousands of muons to store enough data for other plots
 To avoid huge output files (last time i tried i ended up with a 20GB file, luckily i noticed before further increasing the scale of the simulation...),
 i will sample this data once and then disable it for all the next runs (i'll add it as a parameter of the simulation)!
 
-I want to produce the following plots (where scint/cer accounts for two separate plots, one for each effect):
+I want to collect the following data (where scint/cer accounts for two separate sets, one for each effect):
 
 **Wavelength Distribution of Detected Scint/cer Optical Photons (counts / nm)**: 
 **Emission Time Distribution of Detected Scint/cer Optical Photons (counts / ns)**:
@@ -135,3 +150,4 @@ After veryfing the correct implementation of the detector it will be used in the
 - 2025-10-11: Implemented support for GPS.
 - 2025-10-12: Improved the tracking logic to collect the positions of muons entering the scintillator volume.
 (the project is close to completion, now it will undergo a validation process)
+- 2025-10-14: Added support for production cuts, started the validation process.

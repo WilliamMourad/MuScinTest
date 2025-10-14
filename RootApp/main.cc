@@ -1,6 +1,6 @@
 #define _USE_MATH_DEFINES
 
-#include <windows.h>
+#include <windows.h> // comment this out on non-windows systems
 #include "TApplication.h"
 #include "TCanvas.h"
 #include "TRootCanvas.h"
@@ -30,6 +30,15 @@ Double_t FitFormula(Double_t* x, Double_t* par)
 }
 
 
+// This is just a simple app to quickly check/save plots of the data directly from the Geant4 gui.
+// it can be compiled as a standalone executable and run in the same directory where the output.root file is located.
+// Since i developed it in Windows, i compiled it as a Win applicaiton (so that it could be run safely from the Geant4 app without summoning a new terminal each time).
+// To compile it on unix systems:
+// - replace WinMain with main and remove the windows.h include,
+// - remove the WIN32 parameter (when calling add_executable) from the RootApp/CMakeLists.txt file 
+// 
+// Right now it just saves the histograms collected in the output.root file as images.
+// It can be expanded to do more useful things, but i don't plan on adding them for this specific project.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 // int main(int argc, char** argv)
 {
@@ -62,7 +71,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         1000, 800);
 
     // Plot Histogram as beautiful columns 
-       
 	TH1D* h1 = (TH1D*)f.Get("ScintOpticalPhotonsEnergy");
     if (!h1) {
         MessageBox(NULL, "Failed to retrieve histogram h1", "Error", MB_ICONERROR);
@@ -129,7 +137,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     canvas->SaveAs("CerOpticalPhotonsTime.png");
 
     // plot 2d histogram 
-
 	TH2D* h5 = (TH2D*)f.Get("ScintOpticalPhotonsSpread");
     if (!h5) {
         MessageBox(NULL, "Failed to retrieve histogram h5", "Error", MB_ICONERROR);
@@ -175,7 +182,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     canvas->Update();
 
     canvas->SaveAs("OpticalPhotonsReflections.png");
-
 
 
     // Connect the canvas's "Closed" signal to terminate the application

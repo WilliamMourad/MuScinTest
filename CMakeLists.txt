@@ -4,6 +4,9 @@ project(MuScinTest)
 
 # Add RootApp subdirectory
 add_subdirectory(RootApp)
+# Comment this next line if you got the code from GitHub
+# the Analizer subdirectory is just for internal use.
+add_subdirectory(Analyzer)
 
 find_package(Geant4 REQUIRED ui_all vis_all)
 

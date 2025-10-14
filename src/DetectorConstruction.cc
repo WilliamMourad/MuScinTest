@@ -10,6 +10,7 @@
 #include "G4MultiFunctionalDetector.hh"
 #include "G4PSEnergyDeposit.hh"
 #include "G4PSPassageTrackLength.hh"
+#include "G4ProductionCuts.hh"
 
 #include "G4SystemOfUnits.hh"
 
@@ -22,7 +23,8 @@ DetectorConstruction::DetectorConstruction(
 	G4double gap,
 	G4String siliconPMSDName,
 	G4String scintLVName,
-	G4String opCName
+	G4String opCName,
+	G4bool enableCuts
 ) : G4VUserDetectorConstruction()
 {
 	_worldSizeXYZ = worldSizeXYZ;
@@ -34,6 +36,8 @@ DetectorConstruction::DetectorConstruction(
 	_siliconPMSDName = siliconPMSDName;
 	_scintLVName = scintLVName;
 	_opCName = opCName;
+
+	_enableCuts = enableCuts;
 
 	nist = G4NistManager::Instance();
 }
@@ -346,7 +350,31 @@ G4VPhysicalVolume* DetectorConstruction::BuildGeometry()
 
 	#pragma endregion Optical Surfaces Definitions
 
+	// Production Cuts Definitions
+	#pragma region Cuts
 
+	if (_enableCuts)
+	{
+		auto makeRegion = [](const G4String name, G4LogicalVolume* lv, G4double cutGam, G4double cutEm, G4double cutEp){
+			auto* reg = new G4Region(name);
+			reg->AddRootLogicalVolume(lv);
+			auto* cuts = new G4ProductionCuts();
+			cuts->SetProductionCut(cutGam, "gamma");
+			cuts->SetProductionCut(cutEm, "e-");
+			cuts->SetProductionCut(cutEp, "e+");
+			reg->SetProductionCuts(cuts);
+		};
+
+		// I followed a 1/5 or 1/10 rule of thumb for the cuts
+		makeRegion("ScintRegion", scintLogic, 50 * um, 30 * um, 30 * um);
+		makeRegion("SiPMRegion", siPMLogic, 20 * um, 10 * um, 10 * um);
+		makeRegion("XCoatingRegion", xCoatingLogic, 5 * um, 2 * um, 2 * um);
+		makeRegion("YCoatingRegion", yCoatingLogic, 5 * um, 2 * um, 2 * um);
+		makeRegion("FrontCoatingRegion", frontCoatingLogic, 5 * um, 2 * um, 2 * um);
+	}
+
+	#pragma endregion Cuts
+	
 	return worldPhysical;
 }
 

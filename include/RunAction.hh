@@ -4,7 +4,9 @@
 #include "G4AnalysisManager.hh"
 #include "G4Timer.hh"
 
-struct RunActionParameters {};
+struct RunActionParameters {
+	G4bool enableCuts;
+};
 
 class RunAction : public G4UserRunAction 
 {
