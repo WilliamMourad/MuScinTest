@@ -21,6 +21,7 @@ void EventAction::BeginOfEventAction(const G4Event* event)
 
 void EventAction::EndOfEventAction(const G4Event* event) 
 {
+	muonHitRegistered = false; // reset for next event
 
 	G4String siliconPMSDName = _eventActionParameters.siliconPMSDName;
 
@@ -68,6 +69,9 @@ void EventAction::EndOfEventAction(const G4Event* event)
 	G4double siliconPMEdep = SumOverHC(map_siliconPM_edep_HC);
 	G4double muonHitX = muonLocalEntryPosition.x();
 	G4double muonHitY = muonLocalEntryPosition.y();
+
+	// I added this debug line just to make sure everything is working as intended
+	// G4cout << "muonHitX: " << muonHitX / mm << " mm" << G4endl;
 
 	// Analyze & Store in Histograms
 	#pragma region Histograms
@@ -118,7 +122,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
 		analysisManager->FillNtupleDColumn(5, coatingEdep / eV);		// coating edep
 		analysisManager->FillNtupleDColumn(6, scintMuPathLength / mm);	// scint mu path length
 		analysisManager->FillNtupleDColumn(7, muonHitX / mm);			// muon X coordinate on hit
-		analysisManager->FillNtupleDColumn(8, muonHitY/ mm);			// muon Y coordinate on hit 
+		analysisManager->FillNtupleDColumn(8, muonHitY / mm);			// muon Y coordinate on hit 
 		analysisManager->AddNtupleRow();
 	}
 

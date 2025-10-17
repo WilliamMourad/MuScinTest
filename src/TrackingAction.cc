@@ -6,6 +6,7 @@
 #include "G4Track.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4MuonMinus.hh"
+#include "G4SystemOfUnits.hh"
 
 
 static inline G4bool isOpticalPhoton(const G4Track* track) {
@@ -54,6 +55,9 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
 
 	if (trackInfo->enteredScint)
 	{
+		// I added this debug line just to make sure everything is working as intended
+		// G4cout << "[Tracking Action] MuonXPos: " << trackInfo->globalEntryPosition.x() / cm << " cm" << G4endl;
+
 		_eventAction->RegisterMuonHit(
 			trackInfo->localEntryPosition,
 			trackInfo->globalEntryPosition,

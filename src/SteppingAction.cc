@@ -4,6 +4,7 @@
 #include "G4OpBoundaryProcess.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4MuonMinus.hh"
+#include "G4SystemOfUnits.hh"
 
 #include "OpticalPhotonTrackInfo.hh"
 #include "MuTrackInfo.hh"
@@ -112,7 +113,10 @@ void SteppingAction::ProcessMuPosition(const G4Track* track, const G4Step* step)
 	const auto globalPos = postStep->GetPosition();
 	const auto localPos = postStep->GetTouchable()->GetHistory()->GetTopTransform().TransformPoint(globalPos);
 	const auto globalTime = track->GetGlobalTime();
-	
+
+	// I added this debug line just to make sure everything is working as intended
+	// G4cout << "[Stepping Action] MuonXPos: " << globalPos.x() / cm << " cm" << G4endl;
+
 	trackInfo->enteredScint = true;
 	trackInfo->globalEntryPosition = globalPos;
 	trackInfo->localEntryPosition = localPos;
