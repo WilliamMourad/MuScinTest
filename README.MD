@@ -26,7 +26,7 @@ With that in mind i implemented a simple geometry configuration (following the s
 This is the workflow i usually follow when working in Geant4:
 1. program geometry, materials, optical properties and primary generator actions, check that everything works as expected.
 2. program SDs, MVD, run / event / tracking / stepping actions to export data from the simulation, verify that the data matches the theory.
-
+3. scale the simulation to export a multiple sets of data varying input parameters.
 
 # Observations  
 ---
@@ -151,3 +151,4 @@ After veryfing the correct implementation of the detector it will be used in the
 - 2025-10-12: Improved the tracking logic to collect the positions of muons entering the scintillator volume.
 (the project is close to completion, now it will undergo a validation process)
 - 2025-10-14: Added support for production cuts, started the validation process.
+- 2025-10-25: Implemented parameter initialization from YAML configuration file.

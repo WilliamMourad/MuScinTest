@@ -9,6 +9,7 @@ add_subdirectory(RootApp)
 add_subdirectory(Analyzer)
 
 find_package(Geant4 REQUIRED ui_all vis_all)
+find_package(ryml REQUIRED) # I added rapidyaml dependency to parse YAML configuration files
 
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
@@ -16,6 +17,7 @@ file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 add_executable(MuScinTest main.cc ${sources} ${headers})
 target_include_directories(MuScinTest PRIVATE include)
 target_link_libraries(MuScinTest PRIVATE ${Geant4_LIBRARIES})
+target_link_libraries(MuScinTest PRIVATE ryml::ryml)
 
 set(SCRIPTS
 	macros/init.mac
@@ -32,3 +34,9 @@ foreach(_script ${SCRIPTS})
 		COPYONLY
 	)
 endforeach()
+
+configure_file(
+	${PROJECT_SOURCE_DIR}/config.yaml
+	${PROJECT_BINARY_DIR}/config.yaml
+	COPYONLY
+)

@@ -11,6 +11,7 @@
 #include "TrackingAction.hh"
 #include "SteppingAction.hh"
 #include "ActionInitialization.hh"
+#include "YAMLParser.hh"
 
 // Physics 
 #include "G4PhysListFactory.hh"
@@ -34,79 +35,181 @@ int main(int argc, char** argv) {
 	// Set a different random seed based on current time / user preferences
 	CLHEP::HepRandom::setTheSeed(time(NULL));
 
-
-	// A better implementation could be achieved using a json file to set these parameters (i may consider it for future projects)
-	#pragma region Simulation Parameters
-
-	G4bool enableTrackingVerbose = false;
-	G4bool enableVis = false;	// enable visualization, set to false when running heavy batch jobs
-	G4int threads = 20;			// number of threads to be used in MT mode, ignore in ST mode
-
-	G4bool enableCuts = false; // enable production cuts, to test different responses
-
+	G4bool enableParamsFromConfigFile = true;	// enable import of simulation parameters from config.yaml
+	G4bool enableTrackingVerbose = false;		// enable verbose output from TrackingAction (for debugging ONLY)
+	G4bool enableVis = true;					// enable visualization, set to false when running heavy batch jobs
+	G4bool enableCuts = false;					// enable production cuts, to test different responses
+	G4int threads = 20;							// number of threads to be used in MT mode, ignore in ST mode
+	
 	G4String siliconPMSDName = "/SiliconPM";
 	G4String scintLVName = "ScintLogic";
-
 	G4String opCName = "OpticalPhotonHitsCollection";
-
-	G4double worldSizeXYZ = 1. * m;
-	
-	// This is more of an explode factor between the solid components
-	// I use it mostly for visualization/debug purposes
-	G4double gap = 0 * cm; // must be set to 0 in the final version 
-
-	// The thickness of the reflective coating has yet to be formally established
-	// but for the purposes of this project any reasonable value will do
-	G4double coatingThickness = 50 * um;
-	G4double siPMThickness = 3 * mm;
-
-	// The size of the scintillator has yet to be formally established
-	// but for the purposes of this project any reasonable value will do
-	BoxGeometry scintGeometry = BoxGeometry{
-		50. * mm, 
-		50. * mm, 
-		3 * mm 
-	};
-
-	// I set these values to match those of a BC-412 scintillator 
-	// (the full datasheet can be found at https://www.robot-domestici.it/joomla/component/virtuemart/scintillatore-plastico-50--50--5-mm/getfile?file_id=5392)
-	ScintillatorProperties scintData = ScintillatorProperties{
-		scintGeometry,
-		1,			// scalingFactor: lower values reduce the scintillation yield
-		8000.,			// scintYield (photon/MeV)
-		2.85 * eV,		// waveLengthPeak	(434 nm)
-		3.09 * eV,		// waveLengthLeft	(402 nm)
-		2.41 * eV,		// waveLengthRight	(514 nm)
-		3.3 * ns,		// decayTime
-		1.58,			// refractiveIndex
-		210. * cm,		// absorptionLength
-	};
-
-	// These values are used in the primary generator action
 	G4String particleName = "mu-";
 
-	ParticleGunSettings gunSettings = ParticleGunSettings{
-		false,							// isActive
-		1,								// particleN
-		55 * MeV,						// particleEnergy
-		{0, 0, -2.5 * cm},				// gunPosition
-		{0, 0, 1}						// gunDirection
-	};
+	// Forward declaration of simulation parameters
+	G4double worldSizeXYZ, gap, coatingThickness, siPMThickness;
+	BoxGeometry scintGeometry;
+	ScintillatorProperties scintData;
+	ParticleGunSettings gunSettings;
+	GPSSettings gpsSettings;
 
-	GPSSettings gpsSettings = GPSSettings{
-		true,							// isActive
-		1,								// particleN
-		55 * MeV,						// particleMeanEnergy
-		0 * MeV,						// particleEnergySigma
-		{0, 0, -2.5 * cm},				// gpsPosition
-		0.6 * cm,						// gpsRadius
-		{1, 0, 0},						// gpsRot1
-		{0, -1, 0},						// gpsRot2
-		0.01,							// beamApertureX
-		0.01							// beamApertureY
-	};
+	if (enableParamsFromConfigFile) {
+		// Parameters are imported from an external YAML config file
+		// The YAMLParser class is still very basic and lacks proper error handling (I'll add it soon), 
+		// make sure to assign correct values in the config file, be very careful or it will just crash
+		#pragma region Imported Simulation Parameters
+		const char* configFilename = "config.yaml"; // I'll make it so that this can be passed as a command line argument later
+		YAMLParser parser(configFilename);
+		auto root = parser.getRoot();
 
-	#pragma endregion Simulation Parameters
+		// Detector Geometry
+		auto geometryNode = parser.require(root, "detector_geometry");
+		
+		worldSizeXYZ = parser.as_double(parser.require(geometryNode, "world_size_xyz"));
+		gap = parser.as_double(parser.require(geometryNode, "gap"));
+
+		auto componentsNode = parser.require(geometryNode, "components");
+		auto scintNode = parser.require(componentsNode, "scintillator");
+		auto sipmNode = parser.require(componentsNode, "sipm");
+		auto coatingNode = parser.require(componentsNode, "coating");
+
+		auto scintBoxGeomNode = parser.require(scintNode, "box_geometry");
+		auto scintDataNode = parser.require(scintNode, "scint_data");
+
+
+		scintGeometry = {
+			parser.as_double(scintBoxGeomNode[0]),
+			parser.as_double(scintBoxGeomNode[1]),
+			parser.as_double(scintBoxGeomNode[2])
+		};
+		
+		scintData = {
+			scintGeometry,
+			parser.as_double(parser.require(scintDataNode, "yield_factor")),
+			parser.as_double(parser.require(scintDataNode, "yield")),
+			parser.as_double(parser.require(scintDataNode, "wl_peak")),
+			parser.as_double(parser.require(scintDataNode, "wl_left")),
+			parser.as_double(parser.require(scintDataNode, "wl_right")),
+			parser.as_double(parser.require(scintDataNode, "decay_time")),
+			parser.as_double(parser.require(scintDataNode, "r_index")),
+			parser.as_double(parser.require(scintDataNode, "abs_length"))
+		};
+
+		siPMThickness = parser.as_double(parser.require(sipmNode, "thickness"));
+		coatingThickness = parser.as_double(parser.require(coatingNode, "thickness"));
+
+		// Primary Generator
+		auto primaryGenNode = parser.require(root, "primary_generator");
+		auto gunNode = parser.require(primaryGenNode, "particle_gun");
+		auto gpsNode = parser.require(primaryGenNode, "gps");
+
+		gunSettings = {
+			parser.as_bool(parser.require(gunNode, "is_active")),
+			parser.as_int(parser.require(gunNode, "particle_number")),
+			parser.as_double(parser.require(gunNode, "particle_energy")),
+			{
+				parser.as_double(parser.require(gunNode, "position")[0]),
+				parser.as_double(parser.require(gunNode, "position")[1]),
+				parser.as_double(parser.require(gunNode, "position")[2])
+			},
+			{
+				parser.as_double(parser.require(gunNode, "direction")[0]),
+				parser.as_double(parser.require(gunNode, "direction")[1]),
+				parser.as_double(parser.require(gunNode, "direction")[2])
+			}
+		};
+
+		
+
+		gpsSettings = {
+			parser.as_bool(parser.require(gpsNode, "is_active")),
+			parser.as_int(parser.require(gpsNode, "particle_number")),
+			parser.as_double(parser.require(gpsNode, "particle_mean_energy")),
+			parser.as_double(parser.require(gpsNode, "particle_energy_deviation")),
+			{
+				parser.as_double(parser.require(gpsNode, "position")[0]),
+				parser.as_double(parser.require(gpsNode, "position")[1]),
+				parser.as_double(parser.require(gpsNode, "position")[2])
+			},
+			parser.as_double(parser.require(gpsNode, "radius")),
+			{
+				parser.as_double(parser.require(gpsNode, "rotation1")[0]),
+				parser.as_double(parser.require(gpsNode, "rotation1")[1]),
+				parser.as_double(parser.require(gpsNode, "rotation1")[2])
+			},
+			{
+				parser.as_double(parser.require(gpsNode, "rotation2")[0]),
+				parser.as_double(parser.require(gpsNode, "rotation2")[1]),
+				parser.as_double(parser.require(gpsNode, "rotation2")[2])
+			},
+			parser.as_double(parser.require(gpsNode, "beam_aperture_x")),
+			parser.as_double(parser.require(gpsNode, "beam_aperture_y"))
+		};
+		
+		#pragma endregion Imported Simulation Parameters
+	}
+	else {
+		// Set parameters manually without a config file
+		#pragma region Hardcoded Simulation Parameters
+
+		worldSizeXYZ = 1. * m;
+	
+		// This is more of an explode factor between the solid components
+		// I use it mostly for visualization/debug purposes
+		gap = 0 * cm; // must be set to 0 in the final version 
+
+		// The thickness of the reflective coating has yet to be formally established
+		// but for the purposes of this project any reasonable value will do
+		coatingThickness = 50 * um;
+		siPMThickness = 3 * mm;
+
+		// The size of the scintillator has yet to be formally established
+		// but for the purposes of this project any reasonable value will do
+		scintGeometry = BoxGeometry{
+			50. * mm, 
+			50. * mm, 
+			3 * mm 
+		};
+
+		// I set these values to match those of a BC-412 scintillator 
+		// (the full datasheet can be found at https://www.robot-domestici.it/joomla/component/virtuemart/scintillatore-plastico-50--50--5-mm/getfile?file_id=5392)
+		scintData = ScintillatorProperties{
+			scintGeometry,
+			1,				// scalingFactor: lower values reduce the scintillation yield
+			8000.,			// scintYield (photon/MeV)
+			2.85 * eV,		// waveLengthPeak	(434 nm)
+			3.09 * eV,		// waveLengthLeft	(402 nm)
+			2.41 * eV,		// waveLengthRight	(514 nm)
+			3.3 * ns,		// decayTime
+			1.58,			// refractiveIndex
+			210. * cm,		// absorptionLength
+		};
+
+		// These values are used in the primary generator action
+		
+		gunSettings = ParticleGunSettings{
+			false,							// isActive
+			1,								// particleN
+			55 * MeV,						// particleEnergy
+			{0, 0, -2.5 * cm},				// gunPosition
+			{0, 0, 1}						// gunDirection
+		};
+
+		gpsSettings = GPSSettings{
+			true,							// isActive
+			1,								// particleN
+			55 * MeV,						// particleMeanEnergy
+			0 * MeV,						// particleEnergySigma
+			{0, 0, -2.5 * cm},				// gpsPosition
+			0.6 * cm,						// gpsRadius
+			{1, 0, 0},						// gpsRot1
+			{0, -1, 0},						// gpsRot2
+			0.01,							// beamApertureX
+			0.01							// beamApertureY
+		};
+
+		#pragma endregion Hardcoded Simulation Parameters
+	}
 
 
 	#pragma region RunManager Definition
