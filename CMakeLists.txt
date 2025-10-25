@@ -22,6 +22,7 @@ target_link_libraries(MuScinTest PRIVATE ryml::ryml)
 set(SCRIPTS
 	macros/init.mac
 	macros/vis.mac
+	macros/batch.mac
 	macros/paint_geometry.mac
 	macros/build_custom_gui.mac
 	macros/_plot.mac

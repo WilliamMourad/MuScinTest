@@ -20,13 +20,17 @@ public:
 	static std::string as_string(ryml::NodeRef node);
 	static bool as_bool(ryml::NodeRef node);
 
-	ryml::NodeRef getRoot() { return root; };
+	ryml::NodeRef getRoot() const { return root; };
+	bool isLoaded() const { return loaded; }
 	
 private:
 	std::string slurp();
 
 	const char* _filename;
+	
 	std::string content;
 	ryml::Tree tree;
 	ryml::NodeRef root;
+
+	bool loaded = false;
 };

@@ -6,6 +6,8 @@
 
 struct RunActionParameters {
 	G4bool enableCuts;
+	G4String outputDir;
+	G4String outputFile;
 };
 
 class RunAction : public G4UserRunAction 

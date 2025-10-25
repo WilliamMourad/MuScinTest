@@ -3,7 +3,7 @@ detector_geometry:
   gap: 0.0 # mm
   components:
     scintillator:
-      box_geometry: [50.0, 50.0, 10.0] # mm
+      box_geometry: [50.0, 50.0, 3.0] # mm
       scint_data:
         yield_factor: 1.0
         yield: 8000 # MeV-1
@@ -39,4 +39,4 @@ primary_generator:
     
 output: 
   directory: output_data
-  file: output.root
+  file: test_output.root

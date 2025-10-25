@@ -19,10 +19,12 @@ std::string YAMLParser::slurp() {
 	std::ifstream f(_filename, std::ios::binary);
 	if (!f)
 	{
+		loaded = false;
 		throw std::runtime_error(std::string("[YAMLParser] Could not open file: ") + _filename);
 	};
 	std::ostringstream ss;
 	ss << f.rdbuf();
+	loaded = true;
 	return ss.str();
 }
 

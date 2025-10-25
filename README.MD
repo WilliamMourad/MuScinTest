@@ -13,7 +13,14 @@ In particular, for a fixed set of parameters such as
 - the visible light in the scintillator is detected by the SiPM with a good efficiency.
 - the overall detector response is consistent with the theory/literature
 
+# Dependencies
+---
+> **Geant4** (v11.3.0)
 
+> **ROOT** (v6.32.10), to compile and run the RootApp
+
+> **rapidyaml** (v0.10.0), to parse YAML configuration files
+ 
 # Implementation
 ---
 With that in mind i implemented a simple geometry configuration (following the same logic of the LabA3 experiment) that consists of:
@@ -152,3 +159,4 @@ After veryfing the correct implementation of the detector it will be used in the
 (the project is close to completion, now it will undergo a validation process)
 - 2025-10-14: Added support for production cuts, started the validation process.
 - 2025-10-25: Implemented parameter initialization from YAML configuration file.
+- 2025-10-25: Added support for basic command line arguments

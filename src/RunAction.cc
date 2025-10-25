@@ -2,6 +2,7 @@
 
 #include "G4EmCalculator.hh"
 #include "G4SystemOfUnits.hh"
+#include <filesystem>
 
 RunAction::RunAction(RunActionParameters runActionParameters)
 {
@@ -64,7 +65,15 @@ void RunAction::BeginOfRunAction(const G4Run* run)
 {
 	timer->Start();
 
-	analysisManager->OpenFile("output.root");
+	std::string outputDir = _runActionParameters.outputDir;
+	std::string outputFile = _runActionParameters.outputFile;
+
+	namespace fs = std::filesystem;
+	const fs::path outDir{outputDir};
+	std::error_code ec;
+	fs::create_directories(outDir, ec); // safe if already exists
+	const auto outFile = (outDir / outputFile).string();
+	analysisManager->OpenFile(outFile);
 	
 	// Reset ntuple
 	// analysisManager->Reset();
