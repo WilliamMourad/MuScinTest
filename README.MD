@@ -1,9 +1,13 @@
-﻿# Purposes
+﻿![detector](images/detector.png)
+![detector_exploded_](images/detector_exploded.png)
+
+
+# Purposes
 ---
 This Geant4 project is meant to verify the correct implementation of a Scintillator+SiPM detector working with mu- particles.
 
 In particular, for a fixed set of parameters such as 
-- the muons energy distrubution,
+- the muons energy distribution,
 - the spread of the muon beam at the target surface,
 - geometry of the detector (thickness of layers),
 - materials of the detector (scintillation + optical surface logic)

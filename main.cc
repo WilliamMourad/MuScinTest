@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 
 	// This section handles command line arguments, it is meant to let the user run the simulation
 	// in batch mode and optionally specify a different configuration file (to allow scaling via scripting).
-	// It is still very basic and i didn't explore too deep in error handling, just use it with consciously.
+	// It is still very basic and i didn't explore too deep in error handling, just use it consciously.
 	// Note that i willingly disabled the usage of hardcoded parameters (now config.yaml is required, not optional),
 	// i may reintroduce it later if needed (i left the logic in the code).
 	

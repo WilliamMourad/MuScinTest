@@ -62,7 +62,7 @@ G4VPhysicalVolume* DetectorConstruction::BuildGeometry()
 
 	G4double coatingThickness = _coatingThickness;
 
-	G4double siPMThickenss = _siPMThickness;
+	G4double siPMThickness = _siPMThickness;
 
 	G4double gap = _gap;
 
@@ -206,10 +206,10 @@ G4VPhysicalVolume* DetectorConstruction::BuildGeometry()
 		"SiPMSolid",
 		plateSizeX / 2,
 		plateSizeY / 2,
-		siPMThickenss / 2
+		siPMThickness / 2
 	);
 	G4LogicalVolume* siPMLogic = new G4LogicalVolume(siPMSolid, sipm_material, "SiPMLogic");
-	G4ThreeVector siPMPosition = G4ThreeVector(0, 0, plateThickness / 2 + siPMThickenss / 2 + gap);
+	G4ThreeVector siPMPosition = G4ThreeVector(0, 0, plateThickness / 2 + siPMThickness / 2 + gap);
 	
 	G4VPhysicalVolume* siPMPhysical = new G4PVPlacement(
 		nullptr,
@@ -233,10 +233,10 @@ G4VPhysicalVolume* DetectorConstruction::BuildGeometry()
 	// 	"SiPMBulkSolid",
 	// 	plateSizeX / 2,
 	// 	plateSizeY / 2,
-	// 	siPMThickenss / 2 * 0.9
+	// 	siPMThickness / 2 * 0.9
 	// );
 	// G4LogicalVolume* siPMBulkLogic = new G4LogicalVolume(siPMBulkSolid, sipm_material, "SiPMBulkLogic");
-	// G4ThreeVector siPMBulkPosition = G4ThreeVector(0, 0, plateThickness / 2 + siPMThickenss / 2 * 0.9 + gap);
+	// G4ThreeVector siPMBulkPosition = G4ThreeVector(0, 0, plateThickness / 2 + siPMThickness / 2 * 0.9 + gap);
 	// 
 	// G4VPhysicalVolume* siPMBulkPhysical = new G4PVPlacement(
 	// 	nullptr,
