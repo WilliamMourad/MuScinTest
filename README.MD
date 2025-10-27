@@ -1,6 +1,7 @@
-﻿![detector](images/detector.png)
-![detector_exploded_](images/detector_exploded.png)
-
+<p>
+<img src="images/detector.png" width="45%">
+<img src="images/detector_exploded.png" width="45%">
+</p>
 
 # Purposes
 ---
