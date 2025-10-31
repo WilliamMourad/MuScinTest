@@ -106,7 +106,7 @@ About production cuts and the energy deposition of muons: how can i explain obse
 
 # Output
 ---
-Before prooceding i want to report some important considerations regarding data.
+Before proceeding i want to report some important considerations regarding data.
 
 - A lot of space is required to sample single optical photons information (per-photon logs) (just imagine that for each muon, approx 10k photons are produced, 
 the sim requires tens of thousands of muons to store enough data for other plots).

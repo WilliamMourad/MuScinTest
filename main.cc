@@ -92,10 +92,11 @@ int main(int argc, char** argv) {
 				return 1;
 			}
 			G4cout << "|----------> default " << configFilename << " found, starting the simulation with that." << G4endl;
-
-			return 1;
 		}
-		configFilename = flagless_argv[1];
+		else
+		{
+			configFilename = flagless_argv[1];
+		}
 	}
 
 	G4cout << "[MuScinTest] Using configuration file: " << configFilename << G4endl;
@@ -396,11 +397,11 @@ int main(int argc, char** argv) {
 	// Batch mode
 	if (runInBatchMode)
 	{
-			auto UImanager = G4UImanager::GetUIpointer();
-			UImanager->ApplyCommand("/control/execute macros\\batch.mac");
+		auto UImanager = G4UImanager::GetUIpointer();
+		UImanager->ApplyCommand("/control/execute macros\\batch.mac");
 
-			delete runManager;
-			return 0;
+		delete runManager;
+		return 0;
 	}
 
 	auto ui = new G4UIExecutive(argc, argv);
